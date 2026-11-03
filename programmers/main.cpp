@@ -101,6 +101,55 @@ public:
 		return *this;
 	}
 
+	int size() const // const 붙인 이유? : 이 함수 안에서 값을 고치는 일이 없다
+	{
+		return m_size;
+	}
+
+	int capacity() const
+	{
+		return m_capacity;
+	}
+
+	bool empty() const
+	{
+		return m_size == 0; // m_size가 0이면 true 반환, 0이 아니면 false 반환
+	}
+
+	// 제일 뒤에 원소 넣는다. capacity
+	void push_back(T& data)
+	{
+		if (m_size >= m_capacity) // 원소의 개수가 용량 개수랑 같아지면
+		{
+			T* newData = new T[m_capacity * 2]; // 용량 2배
+			// 이제 전거를 여기다 복사해야겠지
+			for (int i = 0; i < m_size; i++)
+			{
+				newData[i] = m_data[i]; // 데이터 복사
+			}
+
+			m_data = newData; // m_data의 주소를 newData의 시작주소로
+			m_capacity = m_capacity * 2; // m_capacity를 2배로
+
+		}
+
+		m_data[++m_size] = data;
+	}
+	
+	// 제일 뒤에 있는거 지운다, capacity는 유지
+	void pop_back()
+	{
+		// m_size가 0이었다면 비어있는거니까 그냥 return
+		if (m_size == 0)
+		{
+			return;
+		}
+
+
+		m_size--; // size만 1 감소시키면 
+	}
+
+
 private:
 	T* m_data;
 	int m_capacity;
