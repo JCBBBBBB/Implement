@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cassert>
 
 using namespace std;
 
@@ -10,9 +11,9 @@ class Vector
 public:
 	Vector()
 	{
-		m_data = nullptr;
-		m_capacity = 0;
+		m_capacity = 1;
 		m_size = 0;
+		m_data = new T[m_capacity];
 	}
 
 	~Vector()
@@ -43,7 +44,7 @@ public:
 			return *this;
 		}
 
-		T* newData = new[other.m_capacity];
+		T* newData = new T[other.m_capacity];
 
 		try
 		{
@@ -52,7 +53,7 @@ public:
 				newData[i] = other.m_data[i];
 			}
 		}
-		catch
+		catch(...)
 		{
 			delete[] newData;
 			newData = nullptr;
@@ -117,7 +118,7 @@ public:
 	}
 
 	// 제일 뒤에 원소 넣는다. capacity
-	void push_back(T& data)
+	void push_back(const T& data)
 	{
 		if (m_size >= m_capacity) // 원소의 개수가 용량 개수랑 같아지면
 		{
@@ -133,7 +134,7 @@ public:
 
 		}
 
-		m_data[++m_size] = data;
+		m_data[m_size++] = data;
 	}
 	
 	// 제일 뒤에 있는거 지운다, capacity는 유지
@@ -149,6 +150,87 @@ public:
 		m_size--; // size만 1 감소시키면 
 	}
 
+	T& operator[](int index)
+	{
+		return m_data[index];
+	}
+
+	T& at(int index)
+	{
+		try
+		{
+			if (index < 0 || index >= m_size)
+			{
+				throw(std::out_of_range("Index Error"));
+			}
+
+			return m_data[index];
+		}
+		catch (const std::out_of_range& error)
+		{
+			cout << error.what() << endl;
+			throw;
+		}
+	}
+
+	void clear()
+	{
+		m_size = 0;
+	}
+
+	void reserve(int n)
+	{
+		if (n <= m_capacity)
+		{
+			return;
+		}
+
+		T* newData = new T[n];
+		for (int i = 0; i < m_size; i++)
+		{
+			newData[i] = m_data[i];
+		}
+
+		delete[] m_data;
+		m_data = nullptr;
+
+		m_data = newData;
+		m_capacity = n;
+	}
+
+	void resize(int n)
+	{
+		if (n == m_size || n < 0) // 바꿀 크기가 현재 수용크기보다 같다면
+		{
+			return;
+		}
+		else if (n < m_size) // 바꿀 크기가 현재 수용크기보다 작다면
+		{
+			m_size = n;
+		}
+		else // 바꿀 크기가 현재 수용크기보다 크다면
+		{
+			if (n > m_capacity)
+			{
+				reserve(n);
+			}
+
+			for (int i = m_size; i < n; i++)
+			{
+				m_data[i] = T{};
+			}
+
+			m_size = n;
+
+		}
+	}
+	
+	/*operator[]	인덱스로 원소 접근.범위 검사 없음
+		at()	인덱스로 원소 접근.범위를 벗어나면 예외 발생
+		clear()	모든 원소 제거.할당한 공간은 유지
+		reserve()	필요하면 저장 공간 확장.size는 유지
+		resize()	원소 수 변경.늘리면 원소 생성, 줄이면 원소 소멸*/
+	
 
 private:
 	T* m_data;
@@ -160,5 +242,11 @@ private:
 
 int main()
 {
+	Vector<int> vec;
+
+	vec.push_back(2);
+	vec.clear();
+
+	cout << vec[0];
 
 }
